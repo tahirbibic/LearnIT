@@ -1,0 +1,6 @@
+{
+  "name": "Feynman's Classroom",
+  "description": "Learn by teaching! Break down complex topics to AI students and master them through the Feynman Technique.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": []
+}
