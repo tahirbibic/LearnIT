@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Login } from './pages/Login';
 import { StartMenu } from './pages/StartMenu';
 import { Classroom } from './pages/Classroom';
@@ -33,7 +33,9 @@ export interface SessionRecord {
 export default function App() {
   const [scene, setScene] = useState<Scene>('login');
   const [username, setUsername] = useState('');
+  const [userId, setUserId] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<'professor' | 'student' | null>(null);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [lessonText, setLessonText] = useState('');
   const [lastConfusion, setLastConfusion] = useState(50);
   const [iqPoints, setIqPoints] = useState(60);
@@ -49,7 +51,7 @@ export default function App() {
       if (!session) setScene('login');
     });
 
-    const saved = localStorage.getItem('feynman_stats');
+    const saved = localStorage.getItem('learnit_stats');
     if (saved) {
       const parsed = JSON.parse(saved);
       setIqPoints(parsed.iqPoints ?? 60);
@@ -63,17 +65,45 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('feynman_stats', JSON.stringify({
-      iqPoints,
-      studentLevel,
-      history,
-      unlockedStudents,
-      activeStudentId
+    localStorage.setItem('learnit_stats', JSON.stringify({
+      iqPoints, studentLevel, history, unlockedStudents, activeStudentId
     }));
+
+    if (userId && username) {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = setTimeout(() => {
+        supabase.from('user_stats').upsert({
+          user_id: userId,
+          username,
+          iq_points: iqPoints,
+          student_level: studentLevel,
+          unlocked_students: unlockedStudents,
+          active_student_id: activeStudentId,
+          history,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' }).catch(() => {});
+      }, 1000);
+    }
   }, [iqPoints, studentLevel, history, unlockedStudents, activeStudentId]);
 
-  const handleLoginSuccess = (name: string) => {
+  const handleLoginSuccess = async (name: string, uid: string) => {
     setUsername(name);
+    setUserId(uid);
+
+    const { data } = await supabase
+      .from('user_stats')
+      .select('*')
+      .eq('user_id', uid)
+      .single();
+
+    if (data) {
+      setIqPoints(data.iq_points);
+      setStudentLevel(data.student_level);
+      setUnlockedStudents(data.unlocked_students ?? ['marko']);
+      setActiveStudentId(data.active_student_id ?? 'marko');
+      setHistory(data.history ?? []);
+    }
+
     setScene('start');
   };
 
@@ -83,8 +113,7 @@ export default function App() {
     if (passed && earned > 20) setStudentLevel(prev => prev + 1);
 
     if (username) {
-      supabase
-        .from('leaderboard')
+      supabase.from('leaderboard')
         .upsert({ username, score: newIq, updated_at: new Date().toISOString() }, { onConflict: 'username' })
         .catch(() => {});
     }

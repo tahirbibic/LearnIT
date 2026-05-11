@@ -110,7 +110,7 @@ export function Store({
             {/* Invisible hitbox — hover detection at exact size */}
             <div
               className="absolute cursor-help z-10"
-              style={{ left: `${slot.imgLeft}%`, top: '34%', width: '14%', height: '29%', border: '2px solid red' }}
+              style={{ left: `${slot.imgLeft}%`, top: '34%', width: '14%', height: '29%' }}
               onMouseEnter={() => setHoveredId(student.id)}
               onMouseLeave={() => setHoveredId(null)}
             />
@@ -126,35 +126,32 @@ export function Store({
                 ${isActive ? 'drop-shadow-[0_0_14px_rgba(255,193,7,0.7)]' : ''}
               `}
               style={{
-                left: `calc(${slot.imgLeft}% - 4%)`,
-                top: '26%',
-                width: '22%',
-                height: '45%',
+                left: `calc(${slot.imgLeft}% - 7%)`,
+                top: '20%',
+                width: '28%',
+                height: '55%',
                 imageRendering: 'pixelated',
                 pointerEvents: 'none',
               }}
             />
 
-            {/* Name & price label (over the drawn label bar) */}
+            {/* Price label (over the drawn label bar) */}
             <div
               className="absolute flex flex-col items-center justify-center"
-              style={{ left: `${slot.nameLeft}%`, top: '62%', width: '14%', height: '7%', border: '2px solid red' }}
+              style={{ left: `${slot.nameLeft}%`, top: '61%', width: '14%', height: '9%' }}
             >
-              <span className="text-[#5c3310] font-bold leading-none" style={{ fontSize: '0.5rem' }}>
-                {student.name.toUpperCase()}
-              </span>
               {!isUnlocked && (
-                <span className="text-[#7a4010]" style={{ fontSize: '0.42rem' }}>
+                <span className="text-black font-bold" style={{ fontSize: '0.75rem' }}>
                   {student.cost} IQ
                 </span>
               )}
               {isActive && (
-                <span className="text-green-800 font-bold" style={{ fontSize: '0.42rem' }}>
+                <span className="text-green-800 font-bold" style={{ fontSize: '0.6rem' }}>
                   ✓ AKTUELAN
                 </span>
               )}
               {isUnlocked && !isActive && (
-                <span className="text-blue-800" style={{ fontSize: '0.42rem' }}>
+                <span className="text-blue-800 font-bold" style={{ fontSize: '0.6rem' }}>
                   KUPLJEN
                 </span>
               )}

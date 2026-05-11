@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface LoginProps {
-  onLoginSuccess: (username: string) => void;
+  onLoginSuccess: (username: string, userId: string) => void;
 }
 
 export function Login({ onLoginSuccess }: LoginProps) {
@@ -33,7 +33,7 @@ export function Login({ onLoginSuccess }: LoginProps) {
         if (signInError) throw signInError;
         if (data.user) {
           const displayName = data.user.user_metadata?.display_name || email.split('@')[0];
-          onLoginSuccess(displayName);
+          onLoginSuccess(displayName, data.user.id);
         }
       }
     } catch (err: any) {

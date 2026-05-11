@@ -1,4 +1,4 @@
-# Feynit
+# LearnIT
 
 Educational game based on the Feynman Technique. Teach AI students to deepen your own understanding. Built with React, Express, Supabase, and OpenAI.
 
@@ -107,7 +107,7 @@ Open http://localhost:5173
 ## Folder Structure
 
 ```
-feynit/
+learnit/
 ├── backend/
 │   ├── server.ts      — Express API (AI proxy, TTS, PDF, leaderboard, documents)
 │   └── package.json
