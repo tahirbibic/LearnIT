@@ -72,16 +72,20 @@ export default function App() {
     if (userId && username) {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = setTimeout(() => {
-        supabase.from('user_stats').upsert({
-          user_id: userId,
-          username,
-          iq_points: iqPoints,
-          student_level: studentLevel,
-          unlocked_students: unlockedStudents,
-          active_student_id: activeStudentId,
-          history,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' }).catch(() => {});
+        void (async () => {
+          try {
+            await supabase.from('user_stats').upsert({
+              user_id: userId,
+              username,
+              iq_points: iqPoints,
+              student_level: studentLevel,
+              unlocked_students: unlockedStudents,
+              active_student_id: activeStudentId,
+              history,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'user_id' });
+          } catch {}
+        })();
       }, 1000);
     }
   }, [iqPoints, studentLevel, history, unlockedStudents, activeStudentId]);

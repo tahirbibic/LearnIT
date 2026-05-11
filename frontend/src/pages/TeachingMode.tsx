@@ -236,6 +236,7 @@ Pravila ponašanja:
     } catch (err) {
       console.error(err);
       setStudentState('neutral');
+      setMessages(prev => [...prev, { sender: 'student', text: 'Oprosti, nisam mogao da odgovorim. Pokušaj ponovo.' }]);
     }
 
     setIsLoading(false);

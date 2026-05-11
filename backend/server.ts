@@ -23,12 +23,25 @@ const openaiTextClient = process.env.GITHUB_TOKEN
   ? new OpenAI({
       baseURL: "https://models.inference.ai.azure.com",
       apiKey: process.env.GITHUB_TOKEN,
+      maxRetries: 0,
     })
   : null;
 
 const openaiTtsClient = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   : null;
+
+if (openaiTextClient) {
+  openaiTextClient.chat.completions.create({
+    model: MODEL,
+    messages: [{ role: "user", content: "ping" }],
+    max_tokens: 1,
+  }).then(() => {
+    console.log("GitHub Models: connection OK");
+  }).catch((err: any) => {
+    console.error("GitHub Models: connection FAILED —", err.message);
+  });
+}
 
 const supabase =
   process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY
@@ -116,17 +129,26 @@ app.post("/api/ai/generate", async (req, res) => {
   if (!openaiTextClient) {
     return res.status(500).json({ error: "GITHUB_TOKEN is not configured." });
   }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 25_000);
+
+  const sendError = (status: number, message: string) => {
+    if (res.headersSent) return;
+    try { res.status(status).json({ error: message }); } catch (_) {}
+  };
+
   try {
     const messages = toOpenAIMessages(contents, systemInstruction);
-    const completion = await openaiTextClient.chat.completions.create({
-      model: MODEL,
-      messages,
-      ...toOpenAIParams(generationConfig),
-    });
-    res.json({ text: completion.choices[0]?.message?.content ?? "" });
+    const completion = await openaiTextClient.chat.completions.create(
+      { model: MODEL, messages, ...toOpenAIParams(generationConfig) },
+      { signal: controller.signal }
+    );
+    clearTimeout(timer);
+    if (!res.headersSent) res.json({ text: completion.choices[0]?.message?.content ?? "" });
   } catch (error: any) {
+    clearTimeout(timer);
     console.error("AI Error:", error.message);
-    res.status(500).json({ error: error.message });
+    sendError(500, error.message ?? "AI request failed");
   }
 });
 
