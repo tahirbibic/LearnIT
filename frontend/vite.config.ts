@@ -14,6 +14,7 @@ export default defineConfig({
     },
   },
   server: {
+    allowedHosts: 'all',
     hmr: process.env.DISABLE_HMR !== 'true',
     proxy: {
       '/api': {

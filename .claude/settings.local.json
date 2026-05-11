@@ -12,7 +12,8 @@
       "Bash(Remove-Item -Path \"C:\\\\Users\\\\Tahir\\\\Desktop\\\\feynit\\\\frontend\\\\.env.example\" -ErrorAction SilentlyContinue)",
       "Bash(Remove-Item -Path \"C:\\\\Users\\\\Tahir\\\\Desktop\\\\feynit\\\\frontend\\\\server.ts\" -ErrorAction SilentlyContinue)",
       "Bash(Remove-Item -Path \"C:\\\\Users\\\\Tahir\\\\Desktop\\\\feynit\\\\frontend\\\\src\\\\App.tsx.bak\" -ErrorAction SilentlyContinue)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "PowerShell(Get-ChildItem *)"
     ]
   }
 }

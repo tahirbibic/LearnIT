@@ -23,6 +23,8 @@ export function LearningMode({ lessonText, onEndLearning, learningLevel }: Learn
   const [isMuted, setIsMuted] = useState(false);
   const [teacherState, setTeacherState] = useState<'neutral' | 'pointing' | 'talking'>('neutral');
   const [sttSupported, setSttSupported] = useState(true);
+  const [lectureTitle, setLectureTitle] = useState('');
+  const [lectureBullets, setLectureBullets] = useState<string[]>([]);
 
   const recognitionRef = useRef<any>(null);
   const chatHistoryRef = useRef<ApiMessage[]>([]);
@@ -115,8 +117,24 @@ PRAVILA ZA PROFESORA:
 2. Svakih par poruka postavi pitanje da proveriš znanje korisnika.
 3. Ako korisnik ne razume, pokušaj na drugi način.
 4. Budi ohrabrujuć i pozitivan.
-5. Odgovori moraju biti kratki i jasni (2-3 rečenice), na SRPSKOM jeziku.
-6. Započni razgovor toplim pozdravom i najavom teme.`;
+5. Nakon svakog objašnjenja, dodaj 1-3 bullet pointe koji sažimaju ključne tačke. Format: svaki bullet počinje sa "- " na novom redu. Svaki bullet mora biti KRATAK — maksimalno 5-6 reči, kao brza napomena, ne cela rečenica.
+6. NIKADA ne koristi Markdown simbole: bez **, bez ->, bez *, bez #, bez _. Samo čist tekst i "- " za bullet pointe.
+7. Odgovori moraju biti kratki i jasni, na SRPSKOM jeziku.
+8. Započni razgovor toplim pozdravom i najavom teme.`;
+  };
+
+  useEffect(() => {
+    if (!lessonText) return;
+    const firstLine = lessonText.split('\n').find(l => l.trim().length > 2)?.trim() ?? '';
+    const words = firstLine.split(/\s+/).slice(0, 3).join(' ').toUpperCase();
+    setLectureTitle(words);
+  }, [lessonText]);
+
+  const extractBullets = (text: string): string[] => {
+    return text.split('\n')
+      .filter(l => l.trim().startsWith('- '))
+      .map(l => l.trim().slice(2).trim())
+      .filter(l => l.length > 0);
   };
 
   useEffect(() => {
@@ -205,6 +223,8 @@ PRAVILA ZA PROFESORA:
       const text = result.text;
       chatHistoryRef.current.push({ role: 'model', parts: [{ text }] });
       setMessages(prev => [...prev, { sender: 'teacher', text }]);
+      const newBullets = extractBullets(text);
+      if (newBullets.length > 0) setLectureBullets(prev => [...prev, ...newBullets]);
       speak(text);
     } catch (err) {
       console.error(err);
@@ -230,7 +250,38 @@ PRAVILA ZA PROFESORA:
       </div>
 
 
-<div className="absolute top-6 left-6 z-20">
+      {lectureBullets.length > 0 && (
+        <div className="absolute top-6 z-20 w-56 max-h-80 overflow-y-auto p-3"
+          style={{ left: '40%' }}
+        >
+          {lectureTitle && (
+            <p className="text-center text-white text-xs font-bold uppercase tracking-widest mb-3"
+              style={{ fontFamily: 'monospace', textShadow: '1px 1px 3px rgba(0,0,0,0.8)' }}
+            >
+              {lectureTitle}
+            </p>
+          )}
+          <ul className="space-y-1.5">
+            <AnimatePresence initial={false}>
+              {lectureBullets.map((bullet, i) => (
+                <motion.li
+                  key={i}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex gap-2 leading-snug"
+                  style={{ color: 'rgba(255,255,255,0.92)', fontSize: '0.7rem', fontFamily: 'monospace', textShadow: '1px 1px 4px rgba(0,0,0,0.9)' }}
+                >
+                  <span className="shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.7)' }}>–</span>
+                  <span>{bullet}</span>
+                </motion.li>
+              ))}
+            </AnimatePresence>
+          </ul>
+        </div>
+      )}
+
+      <div className="absolute top-6 left-6 z-20">
         <button
           onClick={onEndLearning}
           className="px-6 py-3 bg-red-600/80 hover:bg-red-600 text-white font-silkscreen border-4 border-red-900 shadow-lg flex items-center gap-2 transition-all active:scale-95"
