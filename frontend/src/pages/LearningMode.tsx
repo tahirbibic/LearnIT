@@ -251,17 +251,17 @@ PRAVILA ZA PROFESORA:
 
 
       {lectureBullets.length > 0 && (
-        <div className="absolute top-6 z-20 w-56 max-h-80 overflow-y-auto p-3"
-          style={{ left: '40%' }}
+        <div className="absolute top-6 z-20 p-3"
+          style={{ left: '25%', right: '19%', maxHeight: '45vh', overflowY: 'auto' }}
         >
           {lectureTitle && (
-            <p className="text-center text-white text-xs font-bold uppercase tracking-widest mb-3"
+            <p className="text-center text-white text-sm font-bold uppercase tracking-widest mb-3"
               style={{ fontFamily: 'monospace', textShadow: '1px 1px 3px rgba(0,0,0,0.8)' }}
             >
               {lectureTitle}
             </p>
           )}
-          <ul className="space-y-1.5">
+          <ul className="flex flex-wrap gap-x-8 gap-y-2">
             <AnimatePresence initial={false}>
               {lectureBullets.map((bullet, i) => (
                 <motion.li
@@ -270,7 +270,7 @@ PRAVILA ZA PROFESORA:
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                   className="flex gap-2 leading-snug"
-                  style={{ color: 'rgba(255,255,255,0.92)', fontSize: '0.7rem', fontFamily: 'monospace', textShadow: '1px 1px 4px rgba(0,0,0,0.9)' }}
+                  style={{ color: 'rgba(255,255,255,0.92)', fontSize: '1rem', fontFamily: '"Fredoka", sans-serif', textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
                 >
                   <span className="shrink-0 mt-0.5" style={{ color: 'rgba(255,255,255,0.7)' }}>–</span>
                   <span>{bullet}</span>
