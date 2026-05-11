@@ -125,7 +125,9 @@ export default function App() {
 
   return (
     <div className="w-full h-screen bg-black flex items-center justify-center relative">
-      <div className="w-full max-w-6xl aspect-video bg-gray-900 overflow-hidden relative shadow-2xl rounded-sm">
+      <div className="bg-gray-900 overflow-hidden relative shadow-2xl rounded-sm"
+        style={{ width: 'min(100vw, calc(100vh * 16 / 9))', height: 'min(100vh, calc(100vw * 9 / 16))' }}
+      >
         {scene === 'login' && (
           <Login onLoginSuccess={handleLoginSuccess} />
         )}

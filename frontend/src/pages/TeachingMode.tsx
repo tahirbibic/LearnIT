@@ -27,7 +27,7 @@ export function TeachingMode({ lessonText, activeStudent, onEndTeaching }: Teach
   const [messages, setMessages] = useState<Message[]>([]);
   const [apiHistory, setApiHistory] = useState<ApiMessage[]>([]);
   const [inputText, setInputText] = useState('');
-  const [confusion, setConfusion] = useState(50);
+  const [confusion, setConfusion] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [isListening, setIsListening] = useState(false);

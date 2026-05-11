@@ -1,16 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { BookOpen, HelpCircle, ArrowLeft, GraduationCap, X, Library, FileText, Loader } from 'lucide-react';
+import { BookOpen, HelpCircle, ArrowLeft, GraduationCap, X, Library, FileText, Loader2 } from 'lucide-react';
 import { generateContentProxy } from '../lib/ai';
 
 interface BibliotekaDoc {
-  id: string;
+  filename: string;
   name: string;
-  subject: string;
-  storage_path: string;
-  extracted_text: string;
-  file_size: number;
-  created_at: string;
 }
 
 interface StudentClassroomProps {
@@ -83,7 +78,7 @@ export function StudentClassroom({ onBack, onStartLearning, lessonText, setLesso
   const fetchDocuments = useCallback(async () => {
     setIsLoadingDocs(true);
     try {
-      const res = await fetch('/api/documents');
+      const res = await fetch('/api/content-pdfs');
       if (res.ok) setDocuments(await res.json());
     } catch (err) {
       console.error(err);
@@ -97,13 +92,11 @@ export function StudentClassroom({ onBack, onStartLearning, lessonText, setLesso
   }, [popupTab, fetchDocuments]);
 
   const loadFromBiblioteka = async (doc: BibliotekaDoc) => {
-    if (doc.extracted_text) { setLessonText(doc.extracted_text); setActivePopup(null); return; }
     setIsExtracting(true);
     try {
-      const res = await fetch(`/api/documents/${doc.id}/load`, { method: 'POST' });
+      const res = await fetch(`/api/content-pdfs/${encodeURIComponent(doc.filename)}`);
       if (!res.ok) throw new Error((await res.json()).error);
       const { text } = await res.json();
-      setDocuments(prev => prev.map(d => d.id === doc.id ? { ...d, extracted_text: text } : d));
       setLessonText(text);
       setActivePopup(null);
     } catch (err: any) {
@@ -228,7 +221,7 @@ export function StudentClassroom({ onBack, onStartLearning, lessonText, setLesso
                   <div className="flex flex-col flex-1">
                     {isLoadingDocs ? (
                       <div className="flex-1 flex items-center justify-center text-[#5d4037]">
-                        <Loader size={40} className="animate-spin mr-3" />
+                        <Loader2 size={40} className="animate-spin mr-3" />
                         <span className="font-silkscreen text-xl">UČITAVANJE...</span>
                       </div>
                     ) : documents.length === 0 ? (
@@ -240,11 +233,10 @@ export function StudentClassroom({ onBack, onStartLearning, lessonText, setLesso
                     ) : (
                       <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
                         {documents.map((doc) => (
-                          <button key={doc.id} onClick={() => loadFromBiblioteka(doc)} disabled={isExtracting} className="w-full text-left bg-[#fffcf5] border-4 border-[#5d4037] p-5 hover:border-[#d35400] hover:bg-[#fff8ee] transition-all flex items-center gap-4 group disabled:opacity-50">
+                          <button key={doc.filename} onClick={() => loadFromBiblioteka(doc)} disabled={isExtracting} className="w-full text-left bg-[#fffcf5] border-4 border-[#5d4037] p-5 hover:border-[#d35400] hover:bg-[#fff8ee] transition-all flex items-center gap-4 group disabled:opacity-50">
                             <FileText size={32} className="text-[#8b5a33] flex-shrink-0 group-hover:text-[#d35400]" />
                             <div className="flex-1 min-w-0">
                               <p className="font-silkscreen text-xl text-[#5d4037] truncate">{doc.name}</p>
-                              <p className="text-xs font-pixel text-[#8b5a33] mt-1">{doc.subject} · {Math.round(doc.file_size / 1024)} KB</p>
                             </div>
                             <span className="font-silkscreen text-sm text-[#27ae60] flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">UČITAJ →</span>
                           </button>

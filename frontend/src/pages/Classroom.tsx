@@ -178,7 +178,7 @@ export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText,
               exit={{ opacity: 0, scale: 0.9 }}
               className="absolute inset-0 bg-black/60 flex items-center justify-center z-50 p-8"
             >
-              <div className="bg-[#ebd09b] border-8 border-[#c2964e] w-full max-w-4xl min-h-[500px] p-0 text-[#5e411b] relative shadow-[12px_12px_0_rgba(0,0,0,0.5)] flex flex-col overflow-hidden">
+              <div className="bg-[#ebd09b] border-8 border-[#c2964e] w-full max-w-4xl h-[80vh] p-0 text-[#5e411b] relative shadow-[12px_12px_0_rgba(0,0,0,0.5)] flex flex-col overflow-hidden">
                 <button onClick={() => setActivePopup(null)} className="absolute top-2 right-4 text-4xl font-bold hover:text-red-600 transition-colors z-[60]">×</button>
 
                 {activePopup === 'folder' && (

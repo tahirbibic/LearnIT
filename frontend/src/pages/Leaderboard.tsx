@@ -14,26 +14,24 @@ interface LeaderboardProps {
   username: string;
 }
 
-
-// vertical center of each row in the leaderboard image (% of image height)
 const ROW_TOPS = [20, 27.5, 35, 42.5, 50, 57.5, 65, 72.5, 80];
 
 export function Leaderboard({ onBack, iqPoints, username }: LeaderboardProps) {
-  const [apiEntries, setApiEntries] = useState<LeaderboardEntry[]>([]);
+  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
 
   useEffect(() => {
     fetch('/api/leaderboard')
       .then(r => r.json())
       .then((data: { username: string; score: number }[]) => {
-        if (Array.isArray(data) && data.length > 0)
-          setApiEntries(data.map(d => ({ name: d.username, score: d.score })));
+        const fetched = Array.isArray(data) ? data.map(d => ({ name: d.username, score: d.score })) : [];
+        const myEntry: LeaderboardEntry = { name: username || 'Ti', score: iqPoints, isMe: true };
+        const merged = [myEntry, ...fetched.filter(e => e.name !== myEntry.name)];
+        setEntries(merged.sort((a, b) => b.score - a.score).slice(0, 9));
       })
-      .catch(() => {});
+      .catch(() => {
+        setEntries([{ name: username || 'Ti', score: iqPoints, isMe: true }]);
+      });
   }, []);
-
-  const myEntry: LeaderboardEntry = { name: username || 'Ti', score: iqPoints, isMe: true };
-  const merged = [myEntry, ...apiEntries.filter(e => e.name !== myEntry.name)];
-  const sortedAccounts = merged.sort((a, b) => b.score - a.score).slice(0, 9);
 
   return (
     <motion.div
@@ -42,7 +40,6 @@ export function Leaderboard({ onBack, iqPoints, username }: LeaderboardProps) {
       exit={{ opacity: 0 }}
       className="absolute inset-0 w-full h-full font-silkscreen"
     >
-      {/* Background */}
       <img
         src="/assets/leaderboard.jpeg"
         alt="Rang Lista"
@@ -50,34 +47,30 @@ export function Leaderboard({ onBack, iqPoints, username }: LeaderboardProps) {
         style={{ pointerEvents: 'none' }}
       />
 
-      {/* Row data overlaid on the drawn leaderboard rows */}
       <div className="absolute inset-0">
-        {sortedAccounts.map((acc, idx) => (
+        {entries.map((acc, idx) => (
           <div
             key={idx}
             className="absolute inset-x-0 flex items-center"
             style={{ top: `${ROW_TOPS[idx]}%`, height: '6%' }}
           >
-            {/* IQ Score */}
             <span
               className="absolute text-[10px] md:text-xs font-bold"
-              style={{ left: '39.25%', color: idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : idx === 2 ? '#CD7F32' : '#f5e6ce' }}
+              style={{ left: '39.25%', color: acc.isMe ? '#FFD700' : idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : idx === 2 ? '#CD7F32' : '#f5e6ce' }}
             >
               {acc.score}
             </span>
 
-            {/* Name */}
             <span
               className="absolute text-[10px] md:text-xs font-bold uppercase truncate"
-              style={{ left: '44%', maxWidth: '14%', color: idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : idx === 2 ? '#CD7F32' : '#f5e6ce' }}
+              style={{ left: '44%', maxWidth: '14%', color: acc.isMe ? '#FFD700' : idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : idx === 2 ? '#CD7F32' : '#f5e6ce' }}
             >
               {acc.name}
             </span>
 
-            {/* Rank title */}
             <span
               className="absolute text-[9px] md:text-[11px] font-bold uppercase"
-              style={{ left: '58%', color: idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : idx === 2 ? '#CD7F32' : '#f5e6ce' }}
+              style={{ left: '58%', color: acc.isMe ? '#FFD700' : idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : idx === 2 ? '#CD7F32' : '#f5e6ce' }}
             >
               {getIqLevel(acc.score)}
             </span>
@@ -85,7 +78,6 @@ export function Leaderboard({ onBack, iqPoints, username }: LeaderboardProps) {
         ))}
       </div>
 
-      {/* Transparent button over drawn "VRATI SE NAZAD" */}
       <button
         onClick={onBack}
         className="absolute cursor-pointer bg-transparent border-none"
