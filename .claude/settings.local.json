@@ -2,7 +2,17 @@
   "permissions": {
     "allow": [
       "Bash(npm install *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Tahir\\\\Desktop\\\\feynit\" -Recurse -Force)",
+      "Bash(Select-Object -Property FullName, PSIsContainer)",
+      "Bash(Sort-Object FullName)",
+      "Bash(ConvertTo-Csv -NoTypeInformation)",
+      "Bash(Out-String)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Tahir\\\\Desktop\\\\feynit\" -Recurse -Force | Where-Object { $_.PSIsContainer -eq $false } | Select-Object -ExpandProperty FullName | Sort-Object)",
+      "Bash(Remove-Item -Path \"C:\\\\Users\\\\Tahir\\\\Desktop\\\\feynit\\\\frontend\\\\.env.example\" -ErrorAction SilentlyContinue)",
+      "Bash(Remove-Item -Path \"C:\\\\Users\\\\Tahir\\\\Desktop\\\\feynit\\\\frontend\\\\server.ts\" -ErrorAction SilentlyContinue)",
+      "Bash(Remove-Item -Path \"C:\\\\Users\\\\Tahir\\\\Desktop\\\\feynit\\\\frontend\\\\src\\\\App.tsx.bak\" -ErrorAction SilentlyContinue)",
+      "Bash(curl *)"
     ]
   }
 }

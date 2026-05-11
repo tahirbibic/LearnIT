@@ -1,14 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=VT323&family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-pixel: "VT323", monospace;
-  --font-silkscreen: "Silkscreen", monospace;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-pixel: "Fredoka", sans-serif;
+  --font-silkscreen: "Fredoka", sans-serif;
+  --font-sans: "Fredoka", sans-serif;
 }
 
 body {
-  font-family: "Silkscreen", monospace;
+  font-family: "Fredoka", sans-serif;
   image-rendering: pixelated;
   user-select: none;
 }
