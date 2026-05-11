@@ -31,6 +31,7 @@ export function Analytics({ transcript, confusion, lessonText, onBack, onSave }:
         const prompt = `
           Analiziraj sesiju predavanja koristeći Feynmanovu tehniku.
 
+          ${lessonText ? `TEMA LEKCIJE:\n${lessonText.substring(0, 500)}\n` : ''}
           TRANSKRIPT:
           ${chatText}
 
@@ -48,16 +49,21 @@ export function Analytics({ transcript, confusion, lessonText, onBack, onSave }:
         const response = await generateContentProxy({
           model: 'gemini-2.0-flash',
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: 'application/json' },
         });
 
         let text = response.text || "{}";
-        if (text.includes("```json")) {
-          text = text.split("```json")[1].split("```")[0];
-        } else if (text.includes("```")) {
-          text = text.split("```")[1].split("```")[0];
+        // Strip markdown code fences if present
+        const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+        if (fenceMatch) {
+          text = fenceMatch[1];
+        } else {
+          // Extract first JSON object from the text in case of preamble
+          const jsonMatch = text.match(/\{[\s\S]*\}/);
+          if (jsonMatch) text = jsonMatch[0];
         }
 
-        const result = JSON.parse(text) as AnalysisResult;
+        const result = JSON.parse(text.trim()) as AnalysisResult;
         setData(result);
 
         if (!hasSaved) {
