@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { getIqLevel } from '../components/IqLevel';
-import { supabase } from '../lib/supabase';
 
 interface LeaderboardEntry {
   name: string;
@@ -23,16 +22,13 @@ export function Leaderboard({ onBack, iqPoints, username }: LeaderboardProps) {
   const [apiEntries, setApiEntries] = useState<LeaderboardEntry[]>([]);
 
   useEffect(() => {
-    supabase
-      .from('leaderboard')
-      .select('username, score')
-      .order('score', { ascending: false })
-      .limit(10)
-      .then(({ data }) => {
-        if (data && data.length > 0) {
-          setApiEntries(data.map((d: any) => ({ name: d.username, score: d.score })));
-        }
-      });
+    fetch('/api/leaderboard')
+      .then(r => r.json())
+      .then((data: { username: string; score: number }[]) => {
+        if (Array.isArray(data) && data.length > 0)
+          setApiEntries(data.map(d => ({ name: d.username, score: d.score })));
+      })
+      .catch(() => {});
   }, []);
 
   const myEntry: LeaderboardEntry = { name: username || 'Ti', score: iqPoints, isMe: true };

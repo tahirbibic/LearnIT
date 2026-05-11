@@ -113,9 +113,11 @@ export default function App() {
     if (passed && earned > 20) setStudentLevel(prev => prev + 1);
 
     if (username) {
-      supabase.from('leaderboard')
-        .upsert({ username, score: newIq, updated_at: new Date().toISOString() }, { onConflict: 'username' })
-        .catch(() => {});
+      fetch('/api/leaderboard/upsert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, score: newIq }),
+      }).catch(() => {});
     }
 
     setScene('classroom');
@@ -230,7 +232,7 @@ export default function App() {
           />
         )}
 
-        {scene !== 'classroom' && scene !== 'login' && (
+        {(scene === 'start' || scene === 'store') && (
           <div className="absolute bottom-[4%] right-[2%] z-50">
             <IqLevel iqPoints={iqPoints} />
           </div>

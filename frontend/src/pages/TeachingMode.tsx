@@ -272,11 +272,20 @@ Pravila ponašanja:
           <ArrowLeft size={16} /> Završi Predavanje
         </button>
         <button
-          onClick={() => setIsTtsEnabled(!isTtsEnabled)}
+          onClick={() => {
+            const next = !isTtsEnabled;
+            setIsTtsEnabled(next);
+            if (!next) {
+              try { activeSourceRef.current?.stop(); } catch (_) {}
+              window.speechSynthesis?.cancel();
+              setStudentState('neutral');
+              isSpeakingRef.current = false;
+            }
+          }}
           className={`px-4 py-2.5 border-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all active:scale-95 ${isTtsEnabled ? 'bg-blue-600/80 border-blue-800 text-white' : 'bg-black/40 border-white/20 text-white/50'}`}
         >
           {isTtsEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-          {isTtsEnabled ? 'Glas UKL.' : 'Glas ISKL.'}
+          {isTtsEnabled ? 'Učenik: UKL.' : 'Učenik: ISKL.'}
         </button>
       </div>
 
