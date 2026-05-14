@@ -1,4 +1,4 @@
-# feynit
+# FEYNIT
 
 Educational game based on the Feynman Technique. Teach AI students to deepen your own understanding. Built with React, Express, Supabase, and OpenAI.
 
