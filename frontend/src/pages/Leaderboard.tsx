@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { getIqLevel } from '../components/IqLevel';
+import { useLanguage } from '../lib/language';
 
 interface LeaderboardEntry {
   name: string;
@@ -17,6 +18,7 @@ interface LeaderboardProps {
 const ROW_TOPS = [20, 27.5, 35, 42.5, 50, 57.5, 65, 72.5, 80];
 
 export function Leaderboard({ onBack, iqPoints, username }: LeaderboardProps) {
+  const { lang } = useLanguage();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
 
   useEffect(() => {
@@ -72,7 +74,7 @@ export function Leaderboard({ onBack, iqPoints, username }: LeaderboardProps) {
               className="absolute text-[9px] md:text-[11px] font-bold uppercase"
               style={{ left: '58%', color: acc.isMe ? '#FFD700' : idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : idx === 2 ? '#CD7F32' : '#f5e6ce' }}
             >
-              {getIqLevel(acc.score)}
+              {getIqLevel(acc.score, lang)}
             </span>
           </div>
         ))}

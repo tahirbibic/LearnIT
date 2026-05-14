@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, HelpCircle, ArrowLeft, GraduationCap, X, Library, FileText, Loader2 } from 'lucide-react';
 import { generateContentProxy } from '../lib/ai';
+import { useLanguage } from '../lib/language';
 
 interface BibliotekaDoc {
   filename: string;
@@ -18,6 +19,7 @@ interface StudentClassroomProps {
 }
 
 export function StudentClassroom({ onBack, onStartLearning, lessonText, setLessonText, learningLevel, setLearningLevel }: StudentClassroomProps) {
+  const { t } = useLanguage();
   const [activePopup, setActivePopup] = useState<'material' | null>(null);
   const [popupTab, setPopupTab] = useState<'upload' | 'biblioteka'>('upload');
   const [isExtracting, setIsExtracting] = useState(false);
@@ -115,7 +117,7 @@ export function StudentClassroom({ onBack, onStartLearning, lessonText, setLesso
         className="absolute top-[18%] left-[37%] w-[26%] h-[34%] bg-transparent hover:bg-yellow-400/5 cursor-pointer transition-all border-4 border-transparent hover:border-yellow-400/40 rounded-xl z-10 group"
       >
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 text-white p-2 text-[10px] font-pixel whitespace-nowrap mb-2">
-          KLIKNI DA POSTAVIŠ MATERIJAL
+          {t('clickToSetMaterial')}
         </div>
       </button>
 
@@ -127,14 +129,14 @@ export function StudentClassroom({ onBack, onStartLearning, lessonText, setLesso
 
       <div className="absolute top-10 right-10 flex gap-6 z-20">
         <button onClick={onBack} className="px-6 py-4 bg-red-600 text-white border-4 border-red-800 hover:bg-red-500 shadow-[4px_4px_0_rgba(0,0,0,0.5)] flex items-center gap-2 transition-all hover:translate-y-1 hover:shadow-none">
-          <ArrowLeft size={20} /> NAZAD
+          <ArrowLeft size={20} /> {t('back')}
         </button>
         <button
           onClick={onStartLearning}
           disabled={!lessonText}
           className={`px-8 py-4 border-4 shadow-[4px_4px_0_rgba(0,0,0,0.5)] flex items-center gap-2 transition-all hover:translate-y-1 hover:shadow-none ${lessonText ? 'bg-green-600 border-green-800 text-white hover:bg-green-500' : 'bg-gray-400 border-gray-600 text-gray-300 opacity-50 cursor-not-allowed'}`}
         >
-          <GraduationCap size={20} /> NAUČI ME
+          <GraduationCap size={20} /> {t('teachMe')}
         </button>
       </div>
 
@@ -159,10 +161,10 @@ export function StudentClassroom({ onBack, onStartLearning, lessonText, setLesso
                 <div className="flex justify-between items-center mb-6 border-b-4 border-[#5d4037] pb-4">
                   <div className="flex gap-2">
                     <button onClick={() => setPopupTab('upload')} className={`px-6 py-3 font-silkscreen text-lg flex items-center gap-2 border-4 transition-all ${popupTab === 'upload' ? 'bg-[#5d4037] border-[#3d2b1f] text-white' : 'bg-white/40 border-[#5d4037]/30 text-[#5d4037] hover:bg-white/70'}`}>
-                      <BookOpen size={18} /> UPLOAD
+                      <BookOpen size={18} /> {t('uploadFile')}
                     </button>
                     <button onClick={() => setPopupTab('biblioteka')} className={`px-6 py-3 font-silkscreen text-lg flex items-center gap-2 border-4 transition-all ${popupTab === 'biblioteka' ? 'bg-[#5d4037] border-[#3d2b1f] text-white' : 'bg-white/40 border-[#5d4037]/30 text-[#5d4037] hover:bg-white/70'}`}>
-                      <Library size={18} /> BIBLIOTEKA
+                      <Library size={18} /> {t('library')}
                     </button>
                   </div>
                   <button onClick={() => setActivePopup(null)} className="bg-[#5d4037] text-white p-2 hover:bg-red-700 transition-colors"><X size={32} /></button>
@@ -174,43 +176,43 @@ export function StudentClassroom({ onBack, onStartLearning, lessonText, setLesso
                       <div className="flex gap-4">
                         <button onClick={() => fileInputRef.current?.click()} className="flex-1 px-6 py-4 bg-[#3498db] text-white font-silkscreen hover:bg-[#2980b9] border-4 border-[#1a5276] transition-all shadow-[4px_4px_0_#1a5276] active:shadow-none active:translate-y-1 flex items-center justify-center gap-3" disabled={isExtracting}>
                           {isExtracting ? <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}><GraduationCap size={24} /></motion.div> : <BookOpen size={24} />}
-                          {isExtracting ? 'ANALIZIRAM...' : 'OTPREMI PDF / SLIKU'}
+                          {isExtracting ? t('analyzing') : t('uploadPdfImage')}
                         </button>
                         <input type="file" className="hidden" ref={fileInputRef} accept="application/pdf,image/*,text/plain" onChange={handleFileUpload} />
                       </div>
                       <div className="flex-1 flex flex-col min-h-[300px]">
                         <div className="flex justify-between items-end mb-2">
                           <label className="text-sm font-bold text-[#5d4037] uppercase tracking-widest flex items-center gap-2">
-                            <div className="w-2 h-2 bg-red-600 rounded-full" /> SADRŽAJ DNEVNIKA
+                            <div className="w-2 h-2 bg-red-600 rounded-full" /> {t('journalContent')}
                           </label>
-                          <span className="text-[10px] text-gray-500">{lessonText.length} KARAKTERA</span>
+                          <span className="text-[10px] text-gray-500">{lessonText.length} {t('characters')}</span>
                         </div>
-                        <textarea value={lessonText} onChange={(e) => setLessonText(e.target.value)} className="w-full flex-1 bg-[#fffcf5] border-4 border-[#5d4037] p-6 text-lg md:text-xl text-[#3d2b1f] resize-none focus:outline-none focus:border-[#d35400] transition-colors leading-relaxed custom-scrollbar shadow-inner" placeholder="Ovdje nalepi tekst lekcije..." />
+                        <textarea value={lessonText} onChange={(e) => setLessonText(e.target.value)} className="w-full flex-1 bg-[#fffcf5] border-4 border-[#5d4037] p-6 text-lg md:text-xl text-[#3d2b1f] resize-none focus:outline-none focus:border-[#d35400] transition-colors leading-relaxed custom-scrollbar shadow-inner" placeholder={t('pasteLessonText')} />
                       </div>
                     </div>
                     <div className="flex-1 flex flex-col gap-8">
                       <div className="bg-[#e8decb] border-4 border-[#5d4037] p-6 shadow-md">
-                        <h3 className="font-silkscreen text-xl mb-4 text-[#5d4037] border-b-2 border-[#5d4037]/20 pb-2">NIVO PREDAVANJA</h3>
+                        <h3 className="font-silkscreen text-xl mb-4 text-[#5d4037] border-b-2 border-[#5d4037]/20 pb-2">{t('lectureLevel')}</h3>
                         <div className="flex flex-col gap-3">
                           {(['basic', 'medium', 'advanced'] as const).map((level) => (
                             <button key={level} onClick={() => setLearningLevel(level)} className={`w-full px-4 py-3 border-4 font-silkscreen text-sm transition-all text-left flex justify-between items-center ${learningLevel === level ? 'bg-[#5d4037] border-[#3d2b1f] text-white translate-x-2' : 'bg-white/50 border-[#5d4037]/30 text-[#5d4037]/60 hover:bg-white/80'}`}>
-                              {level === 'basic' ? 'OSNOVNI' : level === 'medium' ? 'SREDNJI' : 'NAPREDNI'}
+                              {level === 'basic' ? t('basicLevel') : level === 'medium' ? t('mediumLevel') : t('advancedLevel')}
                               {learningLevel === level && <GraduationCap size={16} />}
                             </button>
                           ))}
                         </div>
                       </div>
                       <div className="bg-[#d4e6f1] border-4 border-[#2e86c1] p-6 shadow-md">
-                        <div className="flex items-center gap-2 mb-3 text-[#1b4f72]"><HelpCircle size={20} /><h4 className="font-silkscreen text-sm">UPUTSTVO:</h4></div>
+                        <div className="flex items-center gap-2 mb-3 text-[#1b4f72]"><HelpCircle size={20} /><h4 className="font-silkscreen text-sm">{t('instructionsTitle')}</h4></div>
                         <ul className="text-[10px] font-pixel text-[#1b4f72] space-y-2">
-                          <li>• Otpremi PDF lekcije ili napiši tekst.</li>
-                          <li>• AI će analizirati materijal i objasniti ga.</li>
-                          <li>• Odaberi nivo težine pre nego kreneš.</li>
+                          <li>• {t('uploadPdfOrWrite')}</li>
+                          <li>• {t('aiWillAnalyze')}</li>
+                          <li>• {t('chooseDifficulty')}</li>
                         </ul>
                       </div>
                       <div className="mt-auto pt-6">
                         <button onClick={() => setActivePopup(null)} className="w-full px-8 py-5 bg-[#27ae60] text-white font-silkscreen text-2xl hover:bg-[#2ecc71] border-4 border-[#1e8449] shadow-[6px_6px_0_#1e8449] active:shadow-none active:translate-y-1 transition-all">
-                          SAČUVAJ I KRENI
+                          {t('saveAndGo')}
                         </button>
                       </div>
                     </div>
@@ -222,13 +224,13 @@ export function StudentClassroom({ onBack, onStartLearning, lessonText, setLesso
                     {isLoadingDocs ? (
                       <div className="flex-1 flex items-center justify-center text-[#5d4037]">
                         <Loader2 size={40} className="animate-spin mr-3" />
-                        <span className="font-silkscreen text-xl">UČITAVANJE...</span>
+                        <span className="font-silkscreen text-xl">{t('loading')}</span>
                       </div>
                     ) : documents.length === 0 ? (
                       <div className="flex-1 flex flex-col items-center justify-center text-[#5d4037] opacity-50">
                         <Library size={64} className="mb-4" />
-                        <p className="font-silkscreen text-xl">Biblioteka je prazna.</p>
-                        <p className="font-pixel text-sm mt-2">Profesor treba da doda PDFove u biblioteku.</p>
+                        <p className="font-silkscreen text-xl">{t('libraryEmpty')}</p>
+                        <p className="font-pixel text-sm mt-2">{t('professorNeedsToAdd')}</p>
                       </div>
                     ) : (
                       <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
@@ -238,7 +240,7 @@ export function StudentClassroom({ onBack, onStartLearning, lessonText, setLesso
                             <div className="flex-1 min-w-0">
                               <p className="font-silkscreen text-xl text-[#5d4037] truncate">{doc.name}</p>
                             </div>
-                            <span className="font-silkscreen text-sm text-[#27ae60] flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">UČITAJ →</span>
+                            <span className="font-silkscreen text-sm text-[#27ae60] flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">{t('load')} →</span>
                           </button>
                         ))}
                       </div>

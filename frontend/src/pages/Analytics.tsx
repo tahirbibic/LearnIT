@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { generateContentProxy } from '../lib/ai';
 import { Message, SessionRecord } from '../App';
 import { Trophy, Target, AlertTriangle, ArrowLeft, BarChart3 } from 'lucide-react';
+import { useLanguage } from '../lib/language';
 
 interface AnalyticsProps {
   transcript: Message[];
@@ -20,6 +21,7 @@ interface AnalysisResult {
 }
 
 export function Analytics({ transcript, confusion, lessonText, onBack, onSave }: AnalyticsProps) {
+  const { lang, t } = useLanguage();
   const [data, setData] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasSaved, setHasSaved] = useState(false);
@@ -37,7 +39,7 @@ export function Analytics({ transcript, confusion, lessonText, onBack, onSave }:
 
           NIVO ZBUNJENOSTI UČENIKA: ${confusion}%
 
-          Vrati ISKLJUČIVO validan JSON objekat na SRPSKOM jeziku:
+          Return ONLY a valid JSON object ${lang === 'en' ? 'in ENGLISH' : 'na SRPSKOM jeziku'}:
           {
             "score": 1-100 (pedagoški skor),
             "goodPoints": ["lista pozitivnih stvari"],
@@ -101,20 +103,20 @@ export function Analytics({ transcript, confusion, lessonText, onBack, onSave }:
             <div className="p-3 bg-blue-600 rounded-lg shadow-[4px_4px_0_#1e3a8a]">
               <BarChart3 size={32} />
             </div>
-            <h1 className="text-4xl font-silkscreen tracking-tighter">ANALITIKA PREDAVANJA</h1>
+            <h1 className="text-4xl font-silkscreen tracking-tighter">{t('lectureAnalytics')}</h1>
           </div>
           <button
             onClick={onBack}
             className="flex items-center gap-2 px-6 py-3 bg-gray-800 border-4 border-gray-700 hover:bg-gray-700 transition-all shadow-[4px_4px_0_#000]"
           >
-            <ArrowLeft size={20} /> NAZAD
+            <ArrowLeft size={20} /> {t('back')}
           </button>
         </header>
 
         {isLoading ? (
           <div className="h-[60vh] flex flex-col items-center justify-center gap-6">
             <div className="w-20 h-20 border-8 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-2xl animate-pulse text-blue-400">AI PIŠE IZVEŠTAJ...</p>
+            <p className="text-2xl animate-pulse text-blue-400">{t('writingReport')}</p>
           </div>
         ) : (
           <motion.div
@@ -127,7 +129,7 @@ export function Analytics({ transcript, confusion, lessonText, onBack, onSave }:
                 <div className="absolute top-0 right-0 p-4 opacity-10">
                   <Trophy size={120} />
                 </div>
-                <h2 className="text-xl text-blue-400 mb-2 uppercase">Pedagoški Rejting</h2>
+                <h2 className="text-xl text-blue-400 mb-2 uppercase">{t('pedagogicalRating')}</h2>
                 <div className="flex items-baseline gap-4">
                   <span className="text-8xl font-silkscreen text-white">{data?.score}</span>
                   <span className="text-2xl text-gray-400">/ 100</span>
@@ -139,16 +141,16 @@ export function Analytics({ transcript, confusion, lessonText, onBack, onSave }:
                 <div className={`p-4 rounded-full mb-4 ${confusion > 50 ? 'bg-red-900/50 text-red-400' : 'bg-green-900/50 text-green-400'}`}>
                   <AlertTriangle size={48} />
                 </div>
-                <h3 className="text-lg text-gray-400 uppercase mb-1">Zbunjenost</h3>
+                <h3 className="text-lg text-gray-400 uppercase mb-1">{t('confusionFinalLabel')}</h3>
                 <span className={`text-6xl font-silkscreen ${confusion > 50 ? 'text-red-500' : 'text-green-500'}`}>{confusion}%</span>
-                <p className="mt-2 text-sm text-gray-500">Krajnji rezultat seanse</p>
+                <p className="mt-2 text-sm text-gray-500">{t('sessionResult')}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-[#064e3b]/30 border-4 border-[#065f46] p-6 rounded-2xl">
                 <h3 className="text-xl font-bold text-green-400 mb-4 flex items-center gap-2">
-                  <Target className="text-green-500" /> ŠTA JE BILO DOBRO
+                  <Target className="text-green-500" /> {t('whatWasGood')}
                 </h3>
                 <ul className="space-y-3">
                   {data?.goodPoints.map((p, i) => (
@@ -161,7 +163,7 @@ export function Analytics({ transcript, confusion, lessonText, onBack, onSave }:
 
               <div className="bg-[#450a0a]/30 border-4 border-[#7f1d1d] p-6 rounded-2xl">
                 <h3 className="text-xl font-bold text-red-400 mb-4 flex items-center gap-2">
-                  <AlertTriangle className="text-red-500" /> ZA POBOLJŠANJE
+                  <AlertTriangle className="text-red-500" /> {t('forImprovement')}
                 </h3>
                 <ul className="space-y-3">
                   {data?.badPoints.map((p, i) => (
@@ -178,7 +180,7 @@ export function Analytics({ transcript, confusion, lessonText, onBack, onSave }:
                 onClick={onBack}
                 className="px-12 py-5 bg-blue-600 hover:bg-blue-500 text-white font-silkscreen text-2xl border-b-8 border-blue-900 shadow-2xl active:border-b-0 active:translate-y-2 transition-all flex items-center gap-4"
               >
-                <ArrowLeft /> NAZAD U ŠKOLU
+                <ArrowLeft /> {t('backToSchool')}
               </button>
             </div>
           </motion.div>

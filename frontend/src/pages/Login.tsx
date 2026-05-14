@@ -57,8 +57,8 @@ export function Login({ onLoginSuccess }: LoginProps) {
 
       {/* Logo — independent, floats above the popup */}
       <img
-        src="/assets/login-logo.png"
-        alt="LearnIT Logo"
+        src="/assets/login_logo.png"
+        alt="feynit Logo"
         className="absolute z-20 h-48 object-contain"
         style={{ imageRendering: 'pixelated', top: '-8%', left: '50%', transform: 'translateX(-50%)' }}
         draggable={false}

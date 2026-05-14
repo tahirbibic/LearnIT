@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { generateContentProxy } from '../lib/ai';
 import { Message } from '../App';
+import { useLanguage } from '../lib/language';
 
 interface ExamModeProps {
   lessonText: string;
@@ -24,6 +25,7 @@ interface StudentAnswer {
 }
 
 export function ExamMode({ lessonText, transcript, confusionScore, studentLevel, onFinish }: ExamModeProps) {
+  const { lang, t } = useLanguage();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [studentAnswers, setStudentAnswers] = useState<StudentAnswer[]>([]);
   const [stage, setStage] = useState<'generating' | 'taking' | 'smoke' | 'results'>('generating');
@@ -33,7 +35,27 @@ export function ExamMode({ lessonText, transcript, confusionScore, studentLevel,
     const generateQuiz = async () => {
       try {
         const chatHistory = transcript.map(m => `${m.sender}: ${m.text}`).join('\n');
-        const prompt = `Na osnovu sledećeg teksta lekcije i transkripta predavanja, napravi kviz od tačno 8 pitanja sa više ponuđenih odgovora (a, b, c, d).
+        const prompt = lang === 'en'
+          ? `Based on the following lesson text and lecture transcript, create a quiz of exactly 8 multiple choice questions (a, b, c, d).
+Questions should focus on what was actually taught in the transcript.
+
+Student difficulty: Level ${studentLevel} (Higher level means more complex questions).
+
+Return ONLY valid JSON in the following format (array of objects):
+[
+  {
+    "q": "Question text here",
+    "options": ["Answer A", "Answer B", "Answer C", "Answer D"],
+    "correctIndex": 0
+  }
+]
+
+LESSON TEXT:
+"${lessonText || 'General knowledge'}"
+
+LECTURE TRANSCRIPT:
+${chatHistory || 'No transcript, use lesson text only.'}`
+          : `Na osnovu sledećeg teksta lekcije i transkripta predavanja, napravi kviz od tačno 8 pitanja sa više ponuđenih odgovora (a, b, c, d).
 Pitanja treba da budu fokusirana na ono što je zapravo predavano u transkriptu.
 
 Težina studenta: Nivo ${studentLevel} (Veći nivo znači kompleksnija pitanja).
@@ -132,14 +154,14 @@ ${chatHistory || 'Nema transkripta, koristi samo tekst lekcije.'}`;
 
         {stage === 'generating' && (
           <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-50">
-            <h2 className="text-4xl text-white animate-pulse font-silkscreen">AI Sastavlja Test na osnovu lekcije...</h2>
+            <h2 className="text-4xl text-white animate-pulse font-silkscreen">{t('generatingTest')}</h2>
           </div>
         )}
 
         {stage === 'taking' && (
           <div className="absolute top-10 left-1/2 -translate-x-1/2 bg-yellow-400 text-black border-4 border-black p-4 z-40 shadow-xl text-center">
-            <h2 className="text-2xl font-bold font-silkscreen">Učenik popunjava test...</h2>
-            <p className="font-pixel text-sm mt-1">Status studenta: Nivo {studentLevel}</p>
+            <h2 className="text-2xl font-bold font-silkscreen">{t('studentFillingTest')}</h2>
+            <p className="font-pixel text-sm mt-1">{t('studentStatusPrefix')} {studentLevel}</p>
           </div>
         )}
 
@@ -236,18 +258,18 @@ ${chatHistory || 'Nema transkripta, koristi samo tekst lekcije.'}`;
             animate={{ opacity: 1, y: 0 }}
             className="absolute top-10 right-10 bg-[#f4e4c4] border-8 border-[#8b5a2b] p-8 text-black z-50 shadow-2xl rotate-2"
           >
-            <h2 className="text-4xl font-silkscreen mb-4 border-b-4 border-black pb-2 text-center">REZULTATI</h2>
-            <p className="text-2xl mb-2">Tačno: <span className="font-bold text-green-700">{grade.score} / 8</span></p>
-            <p className="text-3xl mt-4">Ocena:</p>
+            <h2 className="text-4xl font-silkscreen mb-4 border-b-4 border-black pb-2 text-center">{t('resultsTitle')}</h2>
+            <p className="text-2xl mb-2">{t('correctLabel')} <span className="font-bold text-green-700">{grade.score} / 8</span></p>
+            <p className="text-3xl mt-4">{t('gradeLabel')}</p>
             <p className="text-8xl font-silkscreen text-red-600 text-center my-4 drop-shadow-md">{grade.letter}</p>
             <p className="text-xl bg-yellow-200 p-2 font-bold text-center border-l-4 border-yellow-500">
-              Zaradjeni IQ Poeni: +{grade.iqEarned}
+              {t('iqEarnedLabel')}{grade.iqEarned}
             </p>
             <button
               onClick={() => onFinish(grade.iqEarned, grade.score >= 5)}
               className="mt-8 w-full px-6 py-4 bg-[#8b5a2b] text-white font-silkscreen text-xl hover:bg-[#a67139] border-4 border-[#593922] shadow-[4px_4px_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none transition-all"
             >
-              Završi test
+              {t('finishTest')}
             </button>
           </motion.div>
         )}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
+import { useLanguage } from '../lib/language';
 
 interface StartMenuProps {
   onEnterProfessor: () => void;
@@ -10,6 +11,7 @@ interface StartMenuProps {
 }
 
 export function StartMenu({ onEnterProfessor, onEnterStudent, onStore, onLeaderboard }: StartMenuProps) {
+  const { lang, toggleLang, t } = useLanguage();
   const [fade, setFade] = useState(false);
   const [showBoard, setShowBoard] = useState(false);
   const [showProfessorPrompt, setShowProfessorPrompt] = useState(false);
@@ -53,14 +55,44 @@ export function StartMenu({ onEnterProfessor, onEnterStudent, onStore, onLeaderb
           className="w-full h-full object-cover transition-all duration-500"
         />
 
+        {/* Language toggle */}
+        <div className="absolute left-[-7.5%] top-[-3.5%] z-[200] flex items-center">
+          {/* invisible left hit area */}
+          <button
+            onClick={toggleLang}
+            className="w-10 h-full absolute -left-10 top-0 bg-transparent cursor-pointer"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+          <button
+            onClick={toggleLang}
+            className="hover:scale-105 active:scale-95 transition-transform"
+            title={lang === 'sr' ? 'Switch to English' : 'Prebaci na Srpski'}
+          >
+            <img
+              src={lang === 'sr' ? '/assets/sr-lang-toggle.png' : '/assets/eng-lang-toggle.png'}
+              alt="Language toggle"
+              className="w-[16.5rem] h-[16.5rem] object-contain"
+              style={{ imageRendering: 'pixelated' }}
+            />
+          </button>
+          {/* invisible right hit area */}
+          <button
+            onClick={toggleLang}
+            className="w-10 h-full absolute -right-10 top-0 bg-transparent cursor-pointer"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+        </div>
+
         {!showProfessorPrompt && (
           <button
             onClick={handleProfessorDoorClick}
             className="absolute left-[7%] top-[25%] w-[19%] h-[65%] bg-transparent hover:bg-white/5 cursor-pointer transition-colors border-2 border-transparent hover:border-yellow-400/30 rounded-sm z-10"
-            title="Uđi kao Profesor"
+            title={t('enterAsProfessor')}
           >
             <div className="absolute -top-12 left-1/2 -translate-x-1/2 opacity-0 hover:opacity-100 transition-opacity bg-black/80 text-white p-2 text-xs font-pixel whitespace-nowrap pointer-events-none">
-              UĐI KAO PROFESOR
+              {t('enterAsProfessor')}
             </div>
           </button>
         )}
@@ -79,13 +111,13 @@ export function StartMenu({ onEnterProfessor, onEnterStudent, onStore, onLeaderb
                 <div className="absolute bottom-2 left-2 w-2 h-2 bg-gray-700 rounded-full" />
                 <div className="absolute bottom-2 right-2 w-2 h-2 bg-gray-700 rounded-full" />
                 <div className="bg-[#1a2c21] border-2 border-gray-600 p-8 flex flex-col items-center gap-6">
-                  <h2 className="text-4xl font-silkscreen text-white border-b-4 border-white/20 pb-4 w-full text-center">PROFESOR</h2>
+                  <h2 className="text-4xl font-silkscreen text-white border-b-4 border-white/20 pb-4 w-full text-center">{t('professorTitle')}</h2>
                   <p className="text-xl font-pixel text-green-400 text-center max-w-sm leading-relaxed">
-                    UKOLIKO ŽELIŠ DA USAVRŠIŠ ZNANJE, NASTAVI
+                    {t('professorSubtext')}
                   </p>
                   <div className="flex gap-4">
-                    <button onClick={handleProfessorContinue} className="px-10 py-4 bg-green-600 text-white border-4 border-green-800 hover:bg-green-500 shadow-[4px_4px_0_rgba(0,0,0,0.3)] text-2xl transition-all">NASTAVI</button>
-                    <button onClick={handleBack} className="px-6 py-4 bg-red-600 text-white border-4 border-red-800 hover:bg-red-500 shadow-[4px_4px_0_rgba(0,0,0,0.3)] text-xl transition-all">NAZAD</button>
+                    <button onClick={handleProfessorContinue} className="px-10 py-4 bg-green-600 text-white border-4 border-green-800 hover:bg-green-500 shadow-[4px_4px_0_rgba(0,0,0,0.3)] text-2xl transition-all">{t('continue')}</button>
+                    <button onClick={handleBack} className="px-6 py-4 bg-red-600 text-white border-4 border-red-800 hover:bg-red-500 shadow-[4px_4px_0_rgba(0,0,0,0.3)] text-xl transition-all">{t('back')}</button>
                   </div>
                 </div>
               </motion.div>
@@ -107,13 +139,13 @@ export function StartMenu({ onEnterProfessor, onEnterStudent, onStore, onLeaderb
                 <div className="absolute bottom-2 left-2 w-2 h-2 bg-gray-700 rounded-full" />
                 <div className="absolute bottom-2 right-2 w-2 h-2 bg-gray-700 rounded-full" />
                 <div className="bg-[#1a2c21] border-2 border-gray-600 p-8 flex flex-col items-center gap-6">
-                  <h2 className="text-4xl font-silkscreen text-white border-b-4 border-white/20 pb-4 w-full text-center">UČENIK</h2>
+                  <h2 className="text-4xl font-silkscreen text-white border-b-4 border-white/20 pb-4 w-full text-center">{t('studentTitle')}</h2>
                   <p className="text-xl font-pixel text-green-400 text-center max-w-sm leading-relaxed">
-                    UKOLIKO ŽELIŠ DA NAUČIŠ NEŠTO NOVO, NASTAVI
+                    {t('studentSubtext')}
                   </p>
                   <div className="flex gap-4">
-                    <button onClick={handleStudentContinue} className="px-10 py-4 bg-green-600 text-white border-4 border-green-800 hover:bg-green-500 shadow-[4px_4px_0_rgba(0,0,0,0.3)] text-2xl transition-all">NASTAVI</button>
-                    <button onClick={handleBack} className="px-6 py-4 bg-red-600 text-white border-4 border-red-800 hover:bg-red-500 shadow-[4px_4px_0_rgba(0,0,0,0.3)] text-xl transition-all">NAZAD</button>
+                    <button onClick={handleStudentContinue} className="px-10 py-4 bg-green-600 text-white border-4 border-green-800 hover:bg-green-500 shadow-[4px_4px_0_rgba(0,0,0,0.3)] text-2xl transition-all">{t('continue')}</button>
+                    <button onClick={handleBack} className="px-6 py-4 bg-red-600 text-white border-4 border-red-800 hover:bg-red-500 shadow-[4px_4px_0_rgba(0,0,0,0.3)] text-xl transition-all">{t('back')}</button>
                   </div>
                 </div>
               </motion.div>
@@ -125,10 +157,10 @@ export function StartMenu({ onEnterProfessor, onEnterStudent, onStore, onLeaderb
           <button
             onClick={handleStudentDoorClick}
             className="absolute right-[7%] top-[25%] w-[19%] h-[65%] bg-transparent hover:bg-white/5 cursor-pointer transition-colors border-2 border-transparent hover:border-yellow-400/30 rounded-sm z-10"
-            title="Uđi kao Učenik"
+            title={t('enterAsStudent')}
           >
             <div className="absolute -top-12 left-1/2 -translate-x-1/2 opacity-0 hover:opacity-100 transition-opacity bg-black/80 text-white p-2 text-xs font-pixel whitespace-nowrap pointer-events-none">
-              UĐI KAO UČENIK
+              {t('enterAsStudent')}
             </div>
           </button>
         )}
@@ -137,10 +169,10 @@ export function StartMenu({ onEnterProfessor, onEnterStudent, onStore, onLeaderb
           <button
             onClick={() => setShowBoard(true)}
             className="absolute left-[40%] top-[35%] w-[21%] h-[28%] bg-transparent hover:bg-yellow-400/10 cursor-pointer transition-all border-2 border-transparent hover:border-yellow-400/50 rounded-sm z-10"
-            title="Pogledaj oglasnu tablu"
+            title={t('viewAnnouncements')}
           >
             <div className="absolute -top-12 left-1/2 -translate-x-1/2 opacity-0 hover:opacity-100 transition-opacity bg-black/80 text-white p-2 text-xs font-pixel whitespace-nowrap pointer-events-none">
-              POGLEDAJ OBAVEŠTENJA
+              {t('viewAnnouncements')}
             </div>
           </button>
         )}
@@ -171,7 +203,7 @@ export function StartMenu({ onEnterProfessor, onEnterStudent, onStore, onLeaderb
                   className="absolute left-[8%] top-[10%] w-[40%] h-[80%] bg-transparent hover:bg-yellow-400/5 cursor-pointer transition-colors border-2 border-transparent hover:border-yellow-400/20 group"
                 >
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-black/60 text-white px-4 py-2 font-pixel text-sm whitespace-nowrap transition-opacity">
-                    OTVORI PRODAVNICU
+                    {t('openStore')}
                   </div>
                 </button>
                 <button
@@ -179,7 +211,7 @@ export function StartMenu({ onEnterProfessor, onEnterStudent, onStore, onLeaderb
                   className="absolute right-[8%] top-[10%] w-[40%] h-[80%] bg-transparent hover:bg-green-400/5 cursor-pointer transition-colors border-2 border-transparent hover:border-green-400/20 group"
                 >
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-black/60 text-white px-4 py-2 font-pixel text-sm whitespace-nowrap transition-opacity">
-                    POGLEDAJ TOP LISTU
+                    {t('viewLeaderboard')}
                   </div>
                 </button>
               </motion.div>

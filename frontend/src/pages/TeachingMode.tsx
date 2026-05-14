@@ -4,6 +4,7 @@ import { Mic, MicOff, Send, Volume2, VolumeX, ArrowLeft } from 'lucide-react';
 import { Message } from '../App';
 import { Student } from '../data/students';
 import { generateContentProxy, generateTTS } from '../lib/ai';
+import { useLanguage } from '../lib/language';
 
 declare global {
   interface Window {
@@ -24,6 +25,7 @@ interface ApiMessage {
 }
 
 export function TeachingMode({ lessonText, activeStudent, onEndTeaching }: TeachingModeProps) {
+  const { lang, t } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [apiHistory, setApiHistory] = useState<ApiMessage[]>([]);
   const [inputText, setInputText] = useState('');
@@ -118,7 +120,7 @@ Pravila ponašanja:
 2. Na kraju SVAKE poruke obavezno uključi ovaj tag: [CONFUSION: X] gde je X broj od 0 do 100.
 3. Ako je profesorovo objašnjenje komplikovano, povećaj zbunjenost (npr. [CONFUSION: 85]).
 4. Ako profesor koristi jednostavan jezik i analogije, smanji zbunjenost (npr. [CONFUSION: 15]).
-5. Odgovori moraju biti kratki (1-3 rečenice), na SRPSKOM jeziku.
+5. Odgovori moraju biti kratki (1-3 rečenice), na ${t('aiLanguage')} jeziku.
 6. Začni razgovor pitanjem o temi lekcije.
 7. Težina razumevanja je: ${activeStudent.difficulty}.`;
 
@@ -128,9 +130,13 @@ Pravila ponašanja:
     initialized.current = true;
 
     const startChat = async () => {
-      const initialGreeting = activeStudent.id === 'marko'
-        ? "Zdravo profesore! Baš sam uzbuđen zbog današnjeg časa. Šta ćemo to lepo naučiti?"
-        : `Zdravo profesore! Ja sam ${activeStudent.name}. O čemu ćemo danas pričati?`;
+      const initialGreeting = lang === 'en'
+        ? activeStudent.id === 'marko'
+          ? "Hello professor! I'm so excited for today's class. What are we going to learn?"
+          : `Hello professor! I'm ${activeStudent.name}. What are we going to talk about today?`
+        : activeStudent.id === 'marko'
+          ? "Zdravo profesore! Baš sam uzbuđen zbog današnjeg časa. Šta ćemo to lepo naučiti?"
+          : `Zdravo profesore! Ja sam ${activeStudent.name}. O čemu ćemo danas pričati?`;
 
       setMessages([{ sender: 'student', text: initialGreeting }]);
       setApiHistory([{ role: 'model', parts: [{ text: `${initialGreeting} [CONFUSION: 40]` }] }]);
@@ -270,7 +276,7 @@ Pravila ponašanja:
           onClick={() => onEndTeaching(confusion, messages)}
           className="px-5 py-2.5 bg-red-600/80 hover:bg-red-600 text-white border-2 border-red-900 shadow-lg flex items-center gap-2 transition-all active:scale-95 rounded-lg text-sm font-semibold"
         >
-          <ArrowLeft size={16} /> Završi Predavanje
+          <ArrowLeft size={16} /> {t('endLecture')}
         </button>
         <button
           onClick={() => {
@@ -286,12 +292,12 @@ Pravila ponašanja:
           className={`px-4 py-2.5 border-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all active:scale-95 ${isTtsEnabled ? 'bg-blue-600/80 border-blue-800 text-white' : 'bg-black/40 border-white/20 text-white/50'}`}
         >
           {isTtsEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-          {isTtsEnabled ? 'Učenik: UKL.' : 'Učenik: ISKL.'}
+          {isTtsEnabled ? t('studentVoiceOn') : t('studentVoiceOff')}
         </button>
       </div>
 
       <div className="absolute top-4 right-4 z-20 bg-black/60 backdrop-blur-sm border-2 border-white/20 rounded-xl p-3 w-40">
-        <p className="text-yellow-300 text-xs text-center mb-2 font-semibold uppercase tracking-wider">Zbunjenost</p>
+        <p className="text-yellow-300 text-xs text-center mb-2 font-semibold uppercase tracking-wider">{t('confusionLabel')}</p>
         <div className="w-full h-3 bg-black/60 rounded-full overflow-hidden border border-white/10">
           <div
             className="h-full rounded-full transition-all duration-500"
@@ -305,11 +311,11 @@ Pravila ponašanja:
         <div className="max-w-5xl mx-auto px-6 pt-4 pb-6 flex flex-col gap-3">
           <div className="flex items-center justify-between mb-1">
             <span className="text-yellow-400 text-xs font-semibold uppercase tracking-wider">
-              Učenik: {activeStudent.name}
+              {t('studentPrefix')} {activeStudent.name}
             </span>
             {isLoading && (
               <span className="text-yellow-300 text-xs animate-pulse font-medium">
-                {activeStudent.name} razmišlja...
+                {activeStudent.name} {t('thinkingSuffix')}
               </span>
             )}
           </div>
@@ -365,7 +371,7 @@ Pravila ponašanja:
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-              placeholder={isListening ? "Slušam..." : "Predaj lekciju..."}
+              placeholder={isListening ? t('listeningPlaceholder') : t('teachLessonPlaceholder')}
               disabled={!isReady || isLoading}
               rows={2}
               className="flex-1 bg-transparent border-none focus:ring-0 text-white text-sm placeholder:text-white/30 resize-none outline-none"

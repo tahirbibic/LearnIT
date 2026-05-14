@@ -51,7 +51,7 @@ export default function App() {
       if (!session) setScene('login');
     });
 
-    const saved = localStorage.getItem('learnit_stats');
+    const saved = localStorage.getItem('feynit_stats');
     if (saved) {
       const parsed = JSON.parse(saved);
       setIqPoints(parsed.iqPoints ?? 60);
@@ -65,7 +65,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('learnit_stats', JSON.stringify({
+    localStorage.setItem('feynit_stats', JSON.stringify({
       iqPoints, studentLevel, history, unlockedStudents, activeStudentId
     }));
 

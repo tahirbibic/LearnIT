@@ -5,6 +5,7 @@ import { generateContentProxy } from '../lib/ai';
 import { getIqLevel } from '../components/IqLevel';
 import { SessionRecord } from '../App';
 import { Student } from '../data/students';
+import { useLanguage } from '../lib/language';
 
 interface ContentPdf {
   filename: string;
@@ -24,6 +25,7 @@ interface ClassroomProps {
 }
 
 export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText, setLessonText, iqPoints, studentLevel, history, activeStudent }: ClassroomProps) {
+  const { lang, t } = useLanguage();
   const [activePopup, setActivePopup] = useState<'folder' | 'report' | null>(null);
   const [folderTab, setFolderTab] = useState<'new' | 'library' | 'history'>('new');
   const [isExtracting, setIsExtracting] = useState(false);
@@ -134,8 +136,8 @@ export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText,
         />
         <div id="classroom-fallback" className="absolute inset-0 hidden flex-col items-center justify-center text-white text-center p-8 bg-[#3a2818]">
           <div className="mt-8 flex gap-4">
-            <button onClick={onBack} className="px-4 py-2 bg-red-600 text-white">Vrati se nazad</button>
-            <button onClick={onGoToGreenboard} className="px-4 py-2 bg-green-600 text-white">Idi na tablu</button>
+            <button onClick={onBack} className="px-4 py-2 bg-red-600 text-white">{t('goBack')}</button>
+            <button onClick={onGoToGreenboard} className="px-4 py-2 bg-green-600 text-white">{t('goToBoard')}</button>
             <button onClick={() => setActivePopup('folder')} className="px-4 py-2 bg-yellow-600 text-white">Upload PDF</button>
           </div>
         </div>
@@ -165,7 +167,7 @@ export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText,
               className="absolute top-4 left-1/2 -translate-x-1/2 z-[100] bg-green-500 text-white px-8 py-4 border-4 border-green-800 shadow-[4px_4px_0_rgba(0,0,0,0.4)] font-silkscreen text-xl flex items-center gap-3"
             >
               <BookOpen className="animate-bounce" />
-              LEKCIJA USPEŠNO DODATA!
+              {t('lessonAdded')}
             </motion.div>
           )}
         </AnimatePresence>
@@ -188,19 +190,19 @@ export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText,
                         onClick={() => setFolderTab('new')}
                         className={`px-6 py-4 font-silkscreen text-base flex items-center gap-2 ${folderTab === 'new' ? 'bg-[#ebd09b] border-b-8 border-[#ebd09b] -mb-2' : 'hover:bg-[#e4ca8d]'}`}
                       >
-                        <FileText size={18} /> NOVA LEKCIJA
+                        <FileText size={18} /> {t('newLesson')}
                       </button>
                       <button
                         onClick={() => setFolderTab('library')}
                         className={`px-6 py-4 font-silkscreen text-base flex items-center gap-2 ${folderTab === 'library' ? 'bg-[#ebd09b] border-b-8 border-[#ebd09b] -mb-2' : 'hover:bg-[#e4ca8d]'}`}
                       >
-                        <Library size={18} /> BIBLIOTEKA
+                        <Library size={18} /> {t('library')}
                       </button>
                       <button
                         onClick={() => setFolderTab('history')}
                         className={`px-6 py-4 font-silkscreen text-base flex items-center gap-2 ${folderTab === 'history' ? 'bg-[#ebd09b] border-b-8 border-[#ebd09b] -mb-2' : 'hover:bg-[#e4ca8d]'}`}
                       >
-                        <History size={18} /> ISTORIJA ({history.length})
+                        <History size={18} /> {t('historyTab')} ({history.length})
                       </button>
                     </div>
 
@@ -208,16 +210,16 @@ export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText,
                       {folderTab === 'new' && (
                         <div className="flex flex-col h-full">
                           <h2 className="text-3xl font-silkscreen mb-4 flex items-center gap-2">
-                            <FolderOpen /> MATERIJAL ZA PREDAVANJE
+                            <FolderOpen /> {t('teachingMaterial')}
                           </h2>
-                          <p className="mb-4 text-xl">Ubacite tekst lekcije ovde ili otpremite fajl:</p>
+                          <p className="mb-4 text-xl">{t('pasteTextOrUpload')}</p>
                           <div className="flex gap-4 mb-4 items-center">
                             <button
                               onClick={() => fileInputRef.current?.click()}
                               className="px-6 py-3 bg-blue-600 text-white font-silkscreen hover:bg-blue-500 border-4 border-blue-800 transition-all shadow-[4px_4px_0_#1e3a8a] active:shadow-none active:translate-y-1"
                               disabled={isExtracting}
                             >
-                              {isExtracting ? 'ČITANJE...' : 'OTPREMI FAJL'}
+                              {isExtracting ? t('reading') : t('uploadFile')}
                             </button>
                             <input type="file" className="hidden" ref={fileInputRef} accept="application/pdf,image/*,text/plain" onChange={handleFileUpload} />
                           </div>
@@ -225,14 +227,14 @@ export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText,
                             value={lessonText}
                             onChange={(e) => setLessonText(e.target.value)}
                             className="flex-1 w-full bg-[#f9f2e3] border-4 border-[#c2964e] p-6 text-xl resize-none focus:outline-none focus:border-[#8b5a33] custom-scrollbar min-h-[250px]"
-                            placeholder="Zalepljen tekst ili tvoje beleške..."
+                            placeholder={t('textPlaceholder')}
                           />
                           <div className="mt-4 flex justify-end">
                             <button
                               onClick={() => setActivePopup(null)}
                               className="px-10 py-4 bg-[#4ade80] text-black font-silkscreen text-2xl hover:bg-[#22c55e] border-4 border-[#166534] shadow-[6px_6px_0_#166534] active:shadow-none active:translate-y-1 transition-all"
                             >
-                              SAČUVAJ I KRENI
+                              {t('saveAndGo')}
                             </button>
                           </div>
                         </div>
@@ -241,9 +243,9 @@ export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText,
                       {folderTab === 'library' && (
                         <div className="flex flex-col h-full">
                           <h2 className="text-3xl font-silkscreen mb-2 flex items-center gap-2">
-                            <Library /> BIBLIOTEKA GRADIVA
+                            <Library /> {t('contentLibrary')}
                           </h2>
-                          <p className="mb-6 text-lg opacity-70">Izaberi predefinisanu lekciju ili otpremi sopstveni fajl:</p>
+                          <p className="mb-6 text-lg opacity-70">{t('chooseOrUpload')}</p>
 
                           <div className="flex gap-4 mb-6">
                             <button
@@ -251,7 +253,7 @@ export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText,
                               className="px-6 py-3 bg-blue-600 text-white font-silkscreen hover:bg-blue-500 border-4 border-blue-800 transition-all shadow-[4px_4px_0_#1e3a8a] active:shadow-none active:translate-y-1 flex items-center gap-2"
                               disabled={isExtracting || !!presetLoading}
                             >
-                              {isExtracting ? <><Loader2 size={16} className="animate-spin" /> ČITANJE...</> : 'OTPREMI PDF'}
+                              {isExtracting ? <><Loader2 size={16} className="animate-spin" /> {t('reading')}</> : t('uploadPdf')}
                             </button>
                             <input type="file" className="hidden" ref={fileInputRef} accept="application/pdf,image/*,text/plain" onChange={handleFileUpload} />
                           </div>
@@ -259,7 +261,7 @@ export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText,
                           {contentPdfs.length === 0 ? (
                             <div className="flex-1 flex items-center justify-center opacity-50">
                               <Loader2 size={32} className="animate-spin mr-3" />
-                              <span className="text-xl">Učitavanje biblioteke...</span>
+                              <span className="text-xl">{t('loadingLibrary')}</span>
                             </div>
                           ) : (
                             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
@@ -278,9 +280,9 @@ export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText,
                                     className="px-6 py-2.5 bg-[#4ade80] text-black font-silkscreen border-4 border-[#166534] shadow-[4px_4px_0_#166534] hover:bg-[#22c55e] active:shadow-none active:translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                   >
                                     {presetLoading === pdf.filename ? (
-                                      <><Loader2 size={14} className="animate-spin" /> UČITAVAM...</>
+                                      <><Loader2 size={14} className="animate-spin" /> {t('loadingItem')}</>
                                     ) : (
-                                      'UČITAJ'
+                                      t('load')
                                     )}
                                   </button>
                                 </div>
@@ -293,13 +295,13 @@ export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText,
                       {folderTab === 'history' && (
                         <div className="flex flex-col h-full">
                           <h2 className="text-3xl font-silkscreen mb-6 flex items-center gap-2">
-                            <History /> ISTORIJA PREDAVANJA
+                            <History /> {t('teachingHistory')}
                           </h2>
                           {history.length === 0 ? (
                             <div className="flex-1 flex flex-col items-center justify-center text-[#8b5a33] opacity-50 italic">
                               <History size={64} className="mb-4" />
-                              <p className="text-2xl">Još uvek nemate snimljenih analiza.</p>
-                              <p className="text-lg">Završite predavanje da bi se pojavilo ovde.</p>
+                              <p className="text-2xl">{t('noAnalyses')}</p>
+                              <p className="text-lg">{t('finishForHistory')}</p>
                             </div>
                           ) : (
                             <div className="flex-1 overflow-y-auto pr-4 custom-scrollbar space-y-4">
@@ -308,7 +310,7 @@ export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText,
                                   <div className="flex-1">
                                     <div className="flex justify-between mb-2">
                                       <span className="text-xs bg-[#c2964e] text-white px-2 py-1">{record.date}</span>
-                                      <span className="font-silkscreen text-green-700">SKOR: {record.grade}/100</span>
+                                      <span className="font-silkscreen text-green-700">{t('scoreLabel')} {record.grade}/100</span>
                                     </div>
                                     <h4 className="text-2xl font-bold mb-1 truncate max-w-md">{record.topic}</h4>
                                     <p className="text-sm opacity-70 line-clamp-2">{record.report}</p>
@@ -331,37 +333,37 @@ export function Classroom({ onBack, onGoToGreenboard, onHandOutExam, lessonText,
                 {activePopup === 'report' && (
                   <div className="flex flex-col h-full font-pixel p-8">
                     <h2 className="text-3xl font-silkscreen mb-8 border-b-4 border-[#c2964e] pb-2 flex items-center gap-2">
-                      <ScrollText /> DNEVNIK: {activeStudent.name.toUpperCase()}
+                      <ScrollText /> {t('journalTitle')} {activeStudent.name.toUpperCase()}
                     </h2>
                     <div className="flex gap-10">
                       <div className="w-1/3 flex flex-col items-center border-r-4 border-[#c2964e] pr-8">
                         <div className="w-48 h-48 bg-[#f9f2e3] border-8 border-[#c2964e] mb-6 flex items-center justify-center overflow-hidden shadow-lg">
                           <img src={activeStudent.avatar} alt={activeStudent.name} className="w-full h-full object-cover" style={{ imageRendering: 'pixelated' }} />
                         </div>
-                        <h3 className="text-3xl font-bold font-silkscreen text-center">NIVO: <span className="text-red-600">{studentLevel}</span></h3>
-                        <p className="text-xl font-pixel text-[#8b5a33] mb-6 uppercase tracking-wider">{getIqLevel(iqPoints)}</p>
+                        <h3 className="text-3xl font-bold font-silkscreen text-center">{t('levelLabel')} <span className="text-red-600">{studentLevel}</span></h3>
+                        <p className="text-xl font-pixel text-[#8b5a33] mb-6 uppercase tracking-wider">{getIqLevel(iqPoints, lang)}</p>
                         <div className="bg-blue-600 text-white p-6 w-full shadow-[6px_6px_0_#1e3a8a] border-4 border-[#1e3a8a]">
-                          <p className="text-center font-bold text-lg mb-2 uppercase opacity-80">IQ REJTING</p>
+                          <p className="text-center font-bold text-lg mb-2 uppercase opacity-80">{t('iqRating')}</p>
                           <p className="text-center text-6xl font-silkscreen">{iqPoints}</p>
                         </div>
                       </div>
                       <div className="flex-1 space-y-8">
                         <div className="bg-[#f9f2e3] border-4 border-[#c2964e] p-6 shadow-inner">
-                          <h4 className="text-2xl font-bold mb-4 border-b-2 border-[#c2964e]/30 pb-2 uppercase tracking-tighter text-[#8b5a33]">Trenutni Status</h4>
+                          <h4 className="text-2xl font-bold mb-4 border-b-2 border-[#c2964e]/30 pb-2 uppercase tracking-tighter text-[#8b5a33]">{t('currentStatus')}</h4>
                           <ul className="space-y-4 text-xl">
                             <li className="flex gap-3">
-                              <span className="text-[#c2964e]">▶</span> <strong>Tema:</strong> {lessonText ? (lessonText.substring(0, 40) + '...') : 'NIJE ODABRANA'}
+                              <span className="text-[#c2964e]">▶</span> <strong>{t('topicLabel')}</strong> {lessonText ? (lessonText.substring(0, 40) + '...') : t('notSelected')}
                             </li>
                             <li className="flex gap-3">
-                              <span className="text-[#c2964e]">▶</span> <strong>Status:</strong> {lessonText ? <span className="text-green-600 font-bold">SPREMAN ZA TEST</span> : <span className="text-red-500 italic">ČEKA MATERIJAL</span>}
+                              <span className="text-[#c2964e]">▶</span> <strong>{t('statusLabel')}</strong> {lessonText ? <span className="text-green-600 font-bold">{t('readyForTest')}</span> : <span className="text-red-500 italic">{t('waitingForMaterial')}</span>}
                             </li>
                           </ul>
                         </div>
                         <div className="p-6 bg-[#d4bb72]/40 border-l-8 border-[#c2964e] relative overflow-hidden">
                           <div className="absolute -right-4 -bottom-4 opacity-10"><BookOpen size={100} /></div>
-                          <h4 className="font-bold text-2xl mb-3 flex items-center gap-2">SAVET ZA NASTAVNIKA</h4>
+                          <h4 className="font-bold text-2xl mb-3 flex items-center gap-2">{t('teacherTip')}</h4>
                           <p className="text-lg leading-relaxed italic">
-                            "Objasni kao da imam pet godina." – to je ključ Feynmanove tehnike. Koristi analogije iz svakodnevnog života!
+                            {t('feynmanQuote')}
                           </p>
                         </div>
                       </div>

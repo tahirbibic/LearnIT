@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mic, MicOff, Send, Volume2, VolumeX, ArrowLeft } from 'lucide-react';
 import { generateContentProxy, generateTTS } from '../lib/ai';
+import { useLanguage } from '../lib/language';
 
 interface LearningModeProps {
   lessonText: string;
@@ -15,6 +16,7 @@ interface ApiMessage {
 }
 
 export function LearningMode({ lessonText, onEndLearning, learningLevel }: LearningModeProps) {
+  const { lang, t } = useLanguage();
   const [messages, setMessages] = useState<{ sender: 'teacher' | 'student'; text: string }[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -119,7 +121,7 @@ PRAVILA ZA PROFESORA:
 4. Budi ohrabrujuć i pozitivan.
 5. Nakon svakog objašnjenja, dodaj 1-3 bullet pointe koji sažimaju ključne tačke. Format: svaki bullet počinje sa "- " na novom redu. Svaki bullet mora biti KRATAK — maksimalno 5-6 reči, kao brza napomena, ne cela rečenica.
 6. NIKADA ne koristi Markdown simbole: bez **, bez ->, bez *, bez #, bez _. Samo čist tekst i "- " za bullet pointe.
-7. Odgovori moraju biti kratki i jasni, na SRPSKOM jeziku.
+7. Odgovori moraju biti kratki i jasni, na ${t('aiLanguage')} jeziku.
 8. Započni razgovor toplim pozdravom i najavom teme.`;
   };
 
@@ -142,7 +144,9 @@ PRAVILA ZA PROFESORA:
     initialized.current = true;
 
     const startChat = async () => {
-      const initialGreeting = "Dobar dan! Danas ćemo obraditi lekciju koju si pripremio. Jesi li spreman?";
+      const initialGreeting = lang === 'en'
+        ? "Good day! Today we'll go through the lesson you've prepared. Are you ready?"
+        : "Dobar dan! Danas ćemo obraditi lekciju koju si pripremio. Jesi li spreman?";
       setMessages([{ sender: 'teacher', text: initialGreeting }]);
       chatHistoryRef.current = [{ role: 'model', parts: [{ text: initialGreeting }] }];
       setIsReady(true);
@@ -286,7 +290,7 @@ PRAVILA ZA PROFESORA:
           onClick={onEndLearning}
           className="px-6 py-3 bg-red-600/80 hover:bg-red-600 text-white font-silkscreen border-4 border-red-900 shadow-lg flex items-center gap-2 transition-all active:scale-95"
         >
-          <ArrowLeft size={20} /> IZAĐI
+          <ArrowLeft size={20} /> {t('exit')}
         </button>
       </div>
 
@@ -330,7 +334,7 @@ PRAVILA ZA PROFESORA:
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder={sttSupported ? "Pitaj profesora nešto..." : "Pitaj profesora nešto... (mikrofon nije dostupan)"}
+                placeholder={sttSupported ? t('askProfessor') : t('askProfessorNoMic')}
                 className="w-full bg-transparent border-none focus:ring-0 text-white font-pixel text-lg placeholder:text-white/30"
               />
             </div>

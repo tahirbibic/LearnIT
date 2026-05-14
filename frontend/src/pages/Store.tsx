@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2 } from 'lucide-react';
 import { STUDENTS } from '../data/students';
+import { useLanguage } from '../lib/language';
 
 interface StoreProps {
   onBack: () => void;
@@ -32,13 +33,22 @@ export function Store({
   activeStudentId,
   setActiveStudentId,
 }: StoreProps) {
+  const { t } = useLanguage();
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
+  const [unequipped, setUnequipped] = useState(false);
   const [shake, setShake] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const shopStudents = SLOT_IDS.map(id => STUDENTS.find(s => s.id === id)!).filter(Boolean);
 
   const handleBuy = (student: typeof STUDENTS[0]) => {
+    if (activeStudentId === student.id) {
+      // unequip — fall back to default student marko
+      setActiveStudentId('marko');
+      setUnequipped(true);
+      setTimeout(() => setUnequipped(false), 2000);
+      return;
+    }
     if (unlockedStudents.includes(student.id)) {
       setActiveStudentId(student.id);
       return;
@@ -74,7 +84,21 @@ export function Store({
             className="absolute bottom-24 left-1/2 -translate-x-1/2 z-[100] bg-green-600 text-white px-8 py-4 border-4 border-green-900 shadow-xl flex items-center gap-3 whitespace-nowrap"
           >
             <CheckCircle2 className="animate-bounce" />
-            <span>{purchaseSuccess.toUpperCase()} JE SADA TVOJ STUDENT!</span>
+            <span>{purchaseSuccess.toUpperCase()} {t('isNowYourStudent')}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Unequip toast */}
+      <AnimatePresence>
+        {unequipped && (
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="absolute bottom-24 left-1/2 -translate-x-1/2 z-[100] bg-orange-600 text-white px-8 py-4 border-4 border-orange-900 shadow-xl flex items-center gap-3 whitespace-nowrap"
+          >
+            <span>MARKO {t('isNowYourStudent')}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -102,7 +126,7 @@ export function Store({
                 >
                   <p className="font-bold text-[#ffca28] text-xs mb-1">{student.name.toUpperCase()}</p>
                   <p className="leading-snug text-[10px] opacity-90">{student.description}</p>
-                  <p className="mt-1 text-[10px] text-orange-300">CENA: {student.cost} IQ</p>
+                  <p className="mt-1 text-[10px] text-orange-300">{t('priceLabel')} {student.cost} IQ</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -146,13 +170,17 @@ export function Store({
                 </span>
               )}
               {isActive && (
-                <span className="text-green-800 font-bold" style={{ fontSize: '0.6rem' }}>
-                  ✓ AKTUELAN
+                <span
+                  className="text-green-800 font-bold hover:text-red-700 transition-colors cursor-pointer"
+                  style={{ fontSize: '0.6rem' }}
+                  title={t('unequipStudent')}
+                >
+                  {hoveredId === student.id ? t('unequipStudent') : t('activeStudent')}
                 </span>
               )}
               {isUnlocked && !isActive && (
                 <span className="text-blue-800 font-bold" style={{ fontSize: '0.6rem' }}>
-                  KUPLJEN
+                  {t('purchasedStudent')}
                 </span>
               )}
             </div>
@@ -169,7 +197,7 @@ export function Store({
                 width: `${slot.btnWidth}%`,
                 height: '10%',
                               }}
-              aria-label={isActive ? 'Aktuelan' : isUnlocked ? 'Izaberi' : `Kupi za ${student.cost} IQ`}
+              aria-label={isActive ? t('unequipStudent') : isUnlocked ? t('activeStudent') : `${student.cost} IQ`}
             />
           </div>
         );
